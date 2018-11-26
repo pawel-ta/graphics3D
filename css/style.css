@@ -1,0 +1,51 @@
+
+body {
+	background-color: #0d0106;
+}
+
+#mainHeader {
+    color: #f7f7ff;
+    padding: 0.1%;
+    text-align: center;
+} 
+
+#mainCounter {
+    color: #f7f7ff;
+    padding: 0.1%;
+    text-align: center;
+} 
+
+#overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  color: #f7f7ff;
+  text-align: center;
+  -moz-opacity: 0.5;
+  opacity: 0.5;    
+
+}
+
+#overlay span {
+    padding: auto;
+    border-radius: 5px;
+    color: #000;
+    background-color: #8618e0;
+    position:relative;
+    top:50%;
+}
+
+#mainCanvas {
+    background-color: #785589;
+	display: block;
+    margin-left: auto;
+    margin-right: auto;
+	width: 70%;
+	height: 70%;
+} 
+
+#scoreValue {
+	display: inline;
+}

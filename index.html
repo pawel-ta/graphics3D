@@ -1,0 +1,44 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+
+<html>
+
+	<head>
+		<title>Asteroid - the Game</title>
+		<meta name="description" content="Play Asteroid today!!!">
+		<meta name="keywords" content="Asteroid game, play and avoid asteroids">
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<link rel="stylesheet" type="text/css" href="css/style.css">
+		
+		<!-- IMPORTS -->
+		<script type="text/javascript" src="js/three.js"></script>
+		<script type="text/javascript" src="js/threejs/SceneUtils.js"></script>
+		<script type="text/javascript" src="js/threejs/Sky.js"></script>
+		<script type="text/javascript" src="js/threejs/OrbitControls.js"></script>
+		<script type="text/javascript" src="js/threejs/WebGL.js"></script>
+		<script type="text/javascript" src="https://cdn.rawgit.com/josephg/noisejs/master/perlin.js"></script>
+		<script type="text/javascript" src="js/asteroid.js"></script>
+
+		
+	</head>
+	
+	<body>
+	
+		<h1 id="mainHeader"> <header> Asteroid </header> </h1>
+		
+		<canvas id="mainCanvas"></canvas>
+		<div id="overlay"><span id="canvasText"></span></div>
+		
+		<h2 id="mainCounter">
+			Score: <div id="scoreValue">0</div>
+		</h2>
+	
+		<script type="text/javascript">
+			let asteroidGame = new AsteroidGame("mainCanvas");
+			asteroidGame.initAsteroid();
+			asteroidGame.render();
+		</script>	
+	
+	</body>
+	
+</html>
