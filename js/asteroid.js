@@ -1,9 +1,11 @@
 
 class AsteroidGame{
 	
-	constructor(canvasId) {
+	constructor(canvasId, counterId, textId) {
 
 		this.renderCanvas = document.getElementById(canvasId);
+		this.renderCounter = document.getElementById(counterId);
+		this.renderText = document.getElementById(textId);
 
 		this.scene = new THREE.Scene();
 		this.camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
@@ -40,7 +42,6 @@ class AsteroidGame{
 			this.playerSpeedX = 0;
 		if((this.player.position.y + this.playerSpeedY) < -1.4 || (this.player.position.y + this.playerSpeedY) > 0.7)
 			this.playerSpeedY = 0;
-			
 		
 		this.player.position.x += this.playerSpeedX;
 		this.player.position.y += this.playerSpeedY;
@@ -60,19 +61,14 @@ class AsteroidGame{
 			{
 				this.state = 2;
 			}
-		}	
+		}
 	}
 	
-	moveAsteroids() {
-		if(this.tick%2000 == 0){
-			this.pace += 0.1;
-			this.playerSpeed += 0.1;
-		}
-		
-		if(Math.random() > 0.1 && this.tick%20 == 0){		
-			let playerMaterial = new THREE.MeshPhongMaterial( { color: 0xf4eb42, wireframe: true, vertexColors: THREE.NoColors } );
+	addAsteroids() {
+		if(Math.random()+this.pace > 0.5 && this.tick%10 == 0){		
+			let asteroidMaterial = new THREE.MeshPhongMaterial( { color: 0xf4eb42, wireframe: true, vertexColors: THREE.NoColors } );
 			let newAsteroid = new THREE.SphereGeometry( 0.25, 10, 10 );
-			let asteroidMesh = new THREE.Mesh( newAsteroid, playerMaterial );
+			let asteroidMesh = new THREE.Mesh( newAsteroid, asteroidMaterial );
 			asteroidMesh.position.z = -10;
 			asteroidMesh.position.x = -3.6 + 7.2 * Math.random();
 			asteroidMesh.position.y = -0.7 + 2.4 * Math.random();
@@ -83,8 +79,18 @@ class AsteroidGame{
 			this.scene.add(asteroidMesh);
 			this.obstaclesArray.push(asteroidMesh);
 		}
+	}
+	
+	increasePace() {
+		if(this.tick%200 == 0)
+			if(this.pace < 0.8)
+				this.pace += 0.1;
+
+	}
+	
+	moveAsteroids() {
 		for (var i = 0; i < this.obstaclesArray.length; i++){
-			this.obstaclesArray[i].position.z += 3*this.pace;
+			this.obstaclesArray[i].position.z += this.pace;
 			if(this.obstaclesArray[i].position.z > 3){
 				this.scene.remove(this.obstaclesArray[i]);
 				this.score++;
@@ -101,10 +107,10 @@ class AsteroidGame{
 	}
 	
 	gameSceneRender(){
+	
 		this.simplexPosition += this.pace;
-		
+	
 		noise.seed(this.upperSeed);
-		
 		for(var k=0;k<100;k++) {
 		  for(var l=0;l<100;l++) {
 			var ex = 0.7;
@@ -119,7 +125,6 @@ class AsteroidGame{
 		}
 		
 		noise.seed(this.bottomSeed);
-		
 		for(var k=0;k<100;k++) {
 		  for(var l=0;l<100;l++) {
 			var ex = 0.7;
@@ -154,17 +159,21 @@ class AsteroidGame{
 			this.gameSceneRender();
 			this.collide();
 			this.movePlayer();
+			this.addAsteroids();
+			this.increasePace();
 			this.moveAsteroids();
 		}
 		
 		if(this.state == 0){
+			this.stopBGM();
 			this.renderer.clear(true, true, true);
-			document.getElementById('canvasText').innerHTML = "CLICK TO START";
+			this.renderText.innerHTML = "CLICK TO START, WASD TO MOVE";
 		}
 		
 		if(this.state == 2){
+			this.stopBGM();
 			this.renderer.clear(true, true, true);
-			document.getElementById('canvasText').innerHTML = "YOU SCORED "+this.score+"! CLICK TO RETRY";
+			this.renderText.innerHTML = "YOU SCORED "+this.score+"! CLICK TO RETRY, WASD TO MOVE";
 		}
 		
 		this.updateScore();
@@ -177,7 +186,7 @@ class AsteroidGame{
 	}
 	
 	initLighting() {
-		var light2 = new THREE.PointLight( 0xffcc77, 1.0);
+		var light2 = new THREE.PointLight(0xffcc77, 1.0);
 		this.scene.add(light2);
 		light2.position.z = 3;
 		light2.position.x = 4;
@@ -185,11 +194,9 @@ class AsteroidGame{
 		this.scene.add(new THREE.AmbientLight(0x000055));	
 	}
 	
-	initPlanes() {
-		
+	initPlanes() {	
 		let bottomPlaneMaterial = new THREE.MeshPhongMaterial( { color: 0xff5d00, wireframe: true, vertexColors: THREE.NoColors } );
 		let upperPlaneMaterial = new THREE.MeshPhongMaterial( { color: 0xaadded, wireframe: true, vertexColors: THREE.NoColors } );
-		let playerMaterial = new THREE.MeshPhongMaterial( { color: 0xe000ff, wireframe: true, vertexColors: THREE.NoColors } );
 		
 		this.upperPgeom = new THREE.PlaneGeometry(25,5,99,99);
 		this.upperPgeom.dynamic = true;
@@ -207,16 +214,18 @@ class AsteroidGame{
 		this.bottomPlane.position.y=-2;
 		this.bottomSeed = Math.random();
 		
+	}
+
+	initPlayer() {
+		let playerMaterial = new THREE.MeshPhongMaterial( { color: 0xe000ff, wireframe: true, vertexColors: THREE.NoColors } );
 		this.playerShip = new THREE.ConeGeometry( 0.25, 1, 32 );
 		this.player = new THREE.Mesh( this.playerShip, playerMaterial );
-		
 		this.player.rotation.x = -3.14/2;
-		this.scene.add(this.player);
-		
+		this.scene.add(this.player);	
 	}
 	
 	updateScore() {
-		document.getElementById('scoreValue').innerHTML = this.score;		
+		this.renderCounter.innerHTML = this.score;		
 	}
 	
 	updateSun() {	
@@ -292,7 +301,8 @@ class AsteroidGame{
 	
 	onDocumentMouseDown(event) {	
 		if(this.state != 1){
-			document.getElementById('canvasText').innerHTML = "";
+			this.renderText.innerHTML = "";
+			this.startBGM();
 			this.state = 1;
 			this.simplexPosition = 0;
 			this.pace = 0.1;
@@ -302,12 +312,27 @@ class AsteroidGame{
 		}	
 	}
 	
+	stopBGM() {
+		this.audio.pause();
+	}
+	
+	startBGM() {
+		this.audio.load();
+		this.audio.play();
+	}
+	
+	initMusic() {
+		this.audio = new Audio('http://www.asteroidgame.cba.pl/HD.mp3');
+	}
+	
 	initAsteroid() {	
 	
 		this.initLighting();
 		this.initPlanes();
+		this.initPlayer();
 		this.initSky();
 		this.updateSun();
+		this.initMusic();
 		
 		document.addEventListener("keydown", this.onDocumentKeyDown.bind(this), false);
 		document.addEventListener("keyup", this.onDocumentKeyUp.bind(this), false);
